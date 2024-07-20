@@ -1,0 +1,175 @@
+;Homework M5
+;Creator :Pegah Zargarian
+;Date: 2/7/2022
+
+4.9.2 
+13-What will be the value of EAX after each of the following instructions execute? 
+
+    .data
+    myBytes  BYTE 10h,20h,30h,40h
+    myWords  WORD 3 DUP(?),2000h
+    myString BYTE "ABCDE"
+
+mov  eax,TYPE myBytes ; a= 1 
+mov  eax,LENGTHOF myBytes ; b = 4
+
+mov  eax,SIZEOF myBytes ; c = 1 * 4 = 4   Type * length
+
+mov  eax,TYPE myWords. ; d = 2
+
+mov  eax,LENGTHOF myWords ; e = 4
+
+mov  eax,SIZEOF myWords ; f = 2 * 4 = 8  Type * length
+
+mov  eax,SIZEOF myString ;e = 1* 5 = 5  Type * length
+
+**************************************************************************
+
+Section 4.10 probs 1,2,3,4, 5
+
+★ 1. Converting from Big Endian to Little Endian
+
+
+.386
+.model flat, stdcall
+.stack 4096 
+ExitProcess PROTO, dwExitCode: DWORD
+
+.data
+bigEndian BYTE 12h,34h,56h,78h
+littleEndian DWORD ?
+
+.code
+main PROC
+	mov al, [bigEndian+3]
+	mov BYTE PTR[littleEndian], al
+	mov al, [bigEndian+2]
+	mov BYTE PTR[littleEndian+1], al
+	mov al, [bigEndian+1]
+	mov BYTE PTR[littleEndian+2], al
+	mov al, [bigEndian]
+	mov BYTE PTR[littleEndian+3], al
+	INVOKE ExitProcess, 0
+main ENDP
+END main
+**************************************************************************
+
+★★  2. Exchanging Pairs of Array Values
+
+.386
+.model flat,stdcall
+.stack 4096
+ExitProcess proto,dwExitCode:dword
+.data
+myArray dword 1,2,3,4,5,6,7,8,9,10,11,12
+.code
+main proc
+  mov esi, OFFSET myArray 
+  mov ecx, LENGTHOF myArray -1
+  
+  L1:
+
+    MOV eax,[esi]
+    XCHG eax,[esi+4]
+    MOV [esi],eax
+
+    add esi, TYPE myArray
+    add esi, TYPE myArray
+
+  loop L1
+  INVOKE ExitProcess,0
+main endp
+end main
+
+**************************************************************************
+
+★★  3. Summing the Gaps between Array Values
+
+.386
+.model flat,stdcall
+.stack 4096
+ExitProcess PROTO, dwExitCode:DWORD
+
+.data
+myArray DWORD 0,2,5,9,10
+totalsum DWORD 0
+
+.code
+main PROC
+  mov ecx, LENGTHOF myArray
+  mov esi, OFFSET myArray
+
+  L1:
+	 MOV eax,[esi]
+	 MOV ebx,[esi+4]
+	 SUB ebx,eax     ;gap of two elements
+	 ADD totalsum,ebx     ;accumilation
+	 ADD esi, TYPE myArray
+  Loop L1
+
+  INVOKE ExitProcess,0
+main ENDP
+END main
+
+**************************************************************************
+
+★★  4. Copying a Word Array to a DoubleWord array
+
+.386
+.model flat,stdcall
+.stack 4096
+ExitProcess PROTO, dwExitCode:DWORD
+
+.data
+myArray WORD 1,2,3,4,5
+newArray DWORD LENGTHOF myArray DUP(?)
+.code
+main PROC
+
+  mov ecx, LENGTHOF myArray
+  mov esi, OFFSET myArray
+  mov edi, OFFSET newArray
+
+  myLoop:
+	 MOV eax,0
+	 MOV ax,[esi]
+	 MOV [edi], eax
+	 ADD esi, TYPE myArray
+	 ADD edi, TYPE newArray
+  Loop myLoop
+
+INVOKE ExitProcess,0
+main ENDP
+END main
+**************************************************************************
+
+★★  5. Fibonacci Numbers
+
+.386
+.model flat,stdcall
+.stack 4096
+ExitProcess PROTO, dwExitCode:DWORD
+
+.data
+count DWORD 5
+FiboArray DWORD 1,1,?,?,?,?,?
+.code
+main PROC
+
+  mov ecx, count
+  mov esi, OFFSET FiboArray
+  Add esi, TYPE FiboArray    ;F(1)
+  Add esi, TYPE FiboArray    ;F(2)
+
+  fiboLoop:
+	 MOV eax,[esi-4]   ;Fib(n – 1)
+	 MOV ebx,[esi-8]   ;Fib(n – 2)
+	 ADD eax,ebx	     ;Fib(n) = Fib(n – 1) + Fib(n – 2)
+	 MOV [esi],eax
+	 ADD esi, TYPE FiboArray
+  Loop fiboLoop
+
+INVOKE ExitProcess,0
+main ENDP
+END main
+
